@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VISIS Engine – Cinematic AI Image</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg1: #020617;
+      --bg2: #0b1120;
+      --accent: #38bdf8;
+      --accent2: #6366f1;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --error: #f97373;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;}
+    body{
+      min-height:100vh;
+      background:radial-gradient(circle at top, #1d2437 0, #020617 55%);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .shell{
+      width:100%;
+      max-width:960px;
+      border-radius:24px;
+      padding:22px 22px 24px;
+      background:radial-gradient(circle at top left,rgba(56,189,248,0.18),transparent 55%),
+                 radial-gradient(circle at bottom right,rgba(99,102,241,0.22),transparent 60%),
+                 linear-gradient(145deg,#020617,#020617 40%,#020617);
+      box-shadow:0 32px 80px rgba(15,23,42,0.85);
+      border:1px solid rgba(148,163,184,0.35);
+    }
+    .top{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .orb{
+      width:30px;height:30px;border-radius:999px;
+      background:radial-gradient(circle at 30% 20%,#4adeff,transparent 55%),
+                 radial-gradient(circle at 70% 80%,#6366f1,transparent 60%);
+      box-shadow:0 0 16px rgba(56,189,248,0.8);
+      position:relative;
+      overflow:hidden;
+    }
+    .orb::after{
+      content:"";position:absolute;inset:7px;border-radius:999px;
+      border:1px solid rgba(248,250,252,0.7);box-shadow:0 0 10px rgba(148,163,184,0.8) inset;
+    }
+    .title-main{
+      font-weight:800;
+      letter-spacing:0.15em;
+      font-size:13px;
+      text-transform:uppercase;
+    }
+    .title-sub{
+      font-size:11px;
+      color:var(--muted);
+    }
+    .badge{
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:0.16em;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.6);
+      color:var(--accent);
+    }
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1.1fr) minmax(0,1.1fr);
+      gap:18px;
+    }
+    @media(max-width:800px){
+      .layout{grid-template-columns:1fr;}
+    }
+    .left h1{
+      font-size:clamp(26px,4vw,32px);
+      font-weight:800;
+      line-height:1.1;
+      margin-bottom:8px;
+    }
+    .grad{
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .subtitle{
+      font-size:13px;
+      color:var(--muted);
+      max-width:420px;
+      margin-bottom:14px;
+      line-height:1.5;
+    }
+    textarea{
+      width:100%;
+      min-height:110px;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,0.5);
+      background:rgba(15,23,42,0.85);
+      color:var(--text);
+      padding:10px 12px;
+      font-size:13px;
+      resize:vertical;
+      outline:none;
+    }
+    textarea:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 1px rgba(56,189,248,0.4);
+    }
+    .label{
+      font-size:12px;
+      margin-bottom:4px;
+      color:var(--muted);
+      display:block;
+    }
+    .buttons{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+    }
+    button{
+      border:none;
+      border-radius:999px;
+      padding:7px 16px;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      transition:all .18s;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg,var(--accent2),var(--accent));
+      color:#020617;
+      font-weight:600;
+      box-shadow:0 0 18px rgba(56,189,248,0.6);
+    }
+    .btn-primary:hover{transform:translateY(-1px);opacity:.96;}
+    .btn-ghost{
+      background:transparent;
+      color:var(--muted);
+      border:1px solid rgba(148,163,184,0.55);
+    }
+    .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+    .status{
+      font-size:12px;
+      margin-top:8px;
+      min-height:16px;
+      color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .dot-live{
+      width:7px;height:7px;border-radius:999px;
+      background:#22c55e;box-shadow:0 0 10px rgba(34,197,94,0.9);
+      animation:pulse 1.6s infinite;
+    }
+    @keyframes pulse{
+      0%,100%{opacity:1;}
+      50%{opacity:.4;}
+    }
+    .right{
+      background:radial-gradient(circle at top left,rgba(56,189,248,0.2),transparent 55%),
+                 radial-gradient(circle at bottom right,rgba(99,102,241,0.25),transparent 60%),
+                 #020617;
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,0.35);
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .preview-frame{
+      flex:1;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,0.9);
+      background:radial-gradient(circle at top,#111827 0,#020617 65%);
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px;
+    }
+    .placeholder{
+      font-size:11px;
+      color:var(--muted);
+      text-align:center;
+      max-width:220px;
+    }
+    .preview-img{
+      max-width:100%;
+      max-height:100%;
+      border-radius:12px;
+      box-shadow:0 20px 40px rgba(15,23,42,0.9);
+      display:none;
+    }
+    .error{color:var(--error);}
+    .footer{
+      margin-top:10px;
+      font-size:10px;
+      color:var(--muted);
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="top">
+      <div class="brand">
+        <div class="orb"></div>
+        <div>
+          <div class="title-main">VISIS ENGINE</div>
+          <div class="title-sub">Cinematic AI Image Generator</div>
+        </div>
+      </div>
+      <span class="badge">Alpha · OpenAI Powered</span>
+    </div>
+
+    <section class="layout">
+      <div class="left">
+        <h1>حوّل الوصف إلى <span class="grad">لقطات سينمائية</span> في ثوانٍ.</h1>
+        <p class="subtitle">
+          اكتب مشهدك، واختر زر "Generate Image".  
+          VISIS ENGINE يستخدم نماذج OpenAI لتحويل الوصف إلى صورة واحدة عالية الجودة – مثالية للإعلانات، القصص، والبراند.
+        </p>
+
+        <label class="label" for="prompt">الوصف (بالعربية أو الإنجليزية):</label>
+        <textarea id="prompt" placeholder="مثال: مدينة مستقبلية مضيئة بالنيون عند الغروب، لقطة سينمائية من الأعلى..."></textarea>
+
+        <div class="buttons">
+          <button class="btn-primary" id="btn-image">🎨 Generate Image</button>
+          <button class="btn-ghost" id="btn-clear">✦ مسح المعاينة</button>
+        </div>
+
+        <div class="status" id="status">
+          <span class="dot-live"></span>
+          جاهز للاستقبال. لا تنسَ إضافة مفتاح OpenAI في إعدادات Vercel (OPENAI_API_KEY).
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="preview-frame">
+          <img id="preview" class="preview-img" alt="VISIS result preview" />
+          <div id="placeholder" class="placeholder">
+            لم يتم إنشاء صورة بعد.<br />
+            اكتب وصفاً واضغط <b>Generate Image</b> لترى النتيجة هنا.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <span>VISIS Engine · Prototype v0.1</span>
+      <span>Backend: Vercel Serverless · OpenAI Images API</span>
+    </div>
+  </main>
+
+  <script>
+    const btnImage = document.getElementById('btn-image');
+    const btnClear = document.getElementById('btn-clear');
+    const promptInput = document.getElementById('prompt');
+    const statusEl = document.getElementById('status');
+    const imgEl = document.getElementById('preview');
+    const placeholderEl = document.getElementById('placeholder');
+
+    function setStatus(msg, type="info") {
+      statusEl.textContent = msg;
+      statusEl.classList.remove('error');
+      if (type === 'error') statusEl.classList.add('error');
+    }
+
+    btnClear.addEventListener('click', () => {
+      imgEl.src = "";
+      imgEl.style.display = "none";
+      placeholderEl.style.display = "block";
+      setStatus("تم مسح المعاينة. اكتب وصفاً جديداً وجرب مرة أخرى.");
+    });
+
+    btnImage.addEventListener('click', async () => {
+      const prompt = promptInput.value.trim();
+      if (!prompt) {
+        setStatus("❗ اكتب وصف المشهد أولاً.", "error");
+        return;
+      }
+
+      setStatus("⏳ جاري توليد الصورة عبر OpenAI… قد يستغرق بضع ثوانٍ.");
+      btnImage.disabled = true;
+
+      try {
+        const res = await fetch('/api/generate-image', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ prompt })
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || 'Request failed');
+        }
+
+        const data = await res.json();
+        if (!data || !data.url) {
+          throw new Error('استجابة غير متوقعة من الخادم.');
+        }
+
+        imgEl.src = data.url;
+        imgEl.style.display = "block";
+        placeholderEl.style.display = "none";
+        setStatus("✅ تم إنشاء الصورة بنجاح.");
+      } catch (err) {
+        console.error(err);
+        setStatus("⚠ حدث خطأ أثناء الاتصال بـ OpenAI أو Vercel Function. تأكد من المفتاح (OPENAI_API_KEY) ثم حاول مرة أخرى.", "error");
+      } finally {
+        btnImage.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
